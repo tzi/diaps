@@ -1,6 +1,6 @@
 # Diaps
 
-Like family's diaporama, but in JavaScript
+Like family's diaporama, but in JavaScript. [Slideshow example](https://tzi.github.io/diaps/example/)
 
 ## Quick Start
 
