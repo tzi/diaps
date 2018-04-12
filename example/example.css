@@ -1,0 +1,25 @@
+body {
+    background: black;
+}
+
+.rotL1 {
+    transform: rotate(-2deg);
+}
+
+.rotL2 {
+    transform: rotate(-5deg);
+}
+
+.rotR1 {
+    transform: rotate(2deg);
+}
+
+.rotR2 {
+    transform: rotate(5deg);
+}
+
+.polaroid {
+    padding: 10px;
+    background: white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, .25);
+}

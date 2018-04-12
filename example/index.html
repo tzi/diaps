@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>diaps example</title>
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="../dist/diaps.css">
+    <link rel="stylesheet" href="example.css">
+</head>
+<body>
+<div class="slide"></div>
+
+<script src="../dist/diaps.js"></script>
+<script>
+    Diaps('.slide', function(chain, {Image, Text, layers}) {
+
+        // Create a new sequence to display images from the right to the left
+        const leftRightSequence = function(chain, item, index) {
+            var image = Image.add(item, 'polaroid');
+
+            return chain.exec(index % 2 ? image.slideInRight(layers.right) : image.slideInLeft(layers.left))
+                .exec(index > 1 ? Image.first(index % 2 ? layers.right : layers.left).fadeOut() : false)
+                .wait(2);
+        };
+
+        // Use the sequence on a list of image
+        return chain
+            .exec(Text.add('Welcome to Lyon!').fadeIn(layers.bottom))
+            .delayed(Text.from(layers.bottom).fadeOut(), 4)
+            .wait(2)
+            .sequence(leftRightSequence, [
+                'https://farm8.staticflickr.com/7499/15504613024_2ea6b15241_k.jpg',
+                'https://farm8.staticflickr.com/7497/15940852389_9d5c72c5ca_k.jpg',
+                'https://farm4.staticflickr.com/3064/2531555888_181f33fc26_b.jpg',
+                'https://farm5.staticflickr.com/4085/4963723152_eb55a14faa_b.jpg',
+                'https://farm6.staticflickr.com/5072/7180715452_8578d26573_h.jpg',
+                'https://farm6.staticflickr.com/5556/14336940762_051256ccbb_k.jpg',
+                'https://farm5.staticflickr.com/4274/35300739886_092e074e00_k.jpg',
+                'https://farm4.staticflickr.com/3887/14338602575_be747ce571_k.jpg',
+                'https://farm8.staticflickr.com/7130/7478182646_3057011087_k.jpg',
+            ])
+            .wait(1.5)
+            .exec(Image.first(layers.left).fadeOut())
+            .exec(Image.first(layers.right).fadeOut())
+            .exec(Text.add('Thanks for watching ;)').fadeIn(layers.bottom))
+    });
+</script>
+</body>
+</html>

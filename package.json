@@ -1,0 +1,31 @@
+{
+  "name": "diaps",
+  "version": "1.0.0",
+  "description": "Like family's diaporama, but in JavaScript",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "uglifyjs src/js/*.js > dist/diaps.js && cleancss -o dist/diaps.css src/css/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tzi/diaps.git"
+  },
+  "keywords": [
+    "diaporama"
+  ],
+  "author": "Thomas ZILLIOX <https://tzi.fr>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tzi/diaps/issues"
+  },
+  "homepage": "https://github.com/tzi/diaps#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "clean-css-cli": "^4.1.11",
+    "uglify-es": "^3.3.9"
+  }
+}
