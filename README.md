@@ -26,14 +26,14 @@ Add
 
 Diaps take two parameters:
 
- - selector: a CSS selector to catch your container
- - callback: a callback to drive your slides
+ - `selector`: a CSS selector to catch your container
+ - `callback`: a callback to drive your slides
 
 ## Timing (chain)
 
 The first parameter of your callback is a chain.
 
-The two main methods of your timing chain is:
+The three main methods of your timing chain is:
 
  - `chain.exec(callback)`: take a callback to execute when the time comes
  - `chan.wait(time)`: wait a time in second before executing the next link
