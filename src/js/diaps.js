@@ -5,13 +5,13 @@ const Diaps = function (selector, onStart) {
         node.appendChild(layerElement);
 
         const container = {};
-        container.media = Container(layerElement);
-        container.text = Container(layerElement);
+        container.media = Container(layerElement, 'media');
+        container.text = Container(layerElement, 'text');
 
         return {container};
     };
 
-    const Container = function (layerNode) {
+    const Container = function (layerNode, containerName) {
         const contentList = [];
 
         const add = function (node, animation, onStart) {
@@ -28,10 +28,9 @@ const Diaps = function (selector, onStart) {
                 }
                 content.classList.add('animated', animation);
                 window.requestAnimationFrame(function () {
-                    content.addEventListener('animationend', () => {
+                    content.addEventListener('animationend', function () {
                         content.classList.remove(animation);
-                    })
-                    ;
+                    });
                 });
             };
         };
@@ -64,22 +63,24 @@ const Diaps = function (selector, onStart) {
 
                 content.classList.add('animated', animation);
                 if (onEnd) {
-                    window.requestAnimationFrame(() => {
-                        content.addEventListener('animationend', () => {
+                    window.requestAnimationFrame(function () {
+                        content.addEventListener('animationend', function () {
                             onEnd(content);
-                        })
-                        ;
-                    })
-                    ;
+                        });
+                    });
                 }
             };
         };
 
         const remove = function (query, animation = false) {
-            return function () {
+            return function removeContent () {
                 const content = querying(query);
+                if (!content) {
+                    console.error('Impossible to remove "' + query + '" ' + containerName + ' with "' + animation + '" animation');
+                    return true;
+                }
+
                 contentList.splice(contentList.indexOf(content), 1);
-                console.log(content);
                 animate(content, animation, function () {
                     content.parentNode.removeChild(content);
                 })();
@@ -160,7 +161,7 @@ const Diaps = function (selector, onStart) {
         img.src = src;
         img.style.opacity = 0;
 
-        return NewContent(img, 'media', () => {
+        return NewContent(img, 'media', function () {
             img.style.opacity = 1;
         });
     };
@@ -178,7 +179,7 @@ const Diaps = function (selector, onStart) {
         video.src = src;
         video.style.opacity = 0;
 
-        return NewContent(video, 'media', () => {
+        return NewContent(video, 'media', function () {
             video.style.opacity = 1;
             video.play();
         });
@@ -195,7 +196,7 @@ const Diaps = function (selector, onStart) {
         const div = document.createElement('div');
         div.classList.add('diaps__text', ...extraClasses);
 
-        return NewContent(div, 'text', () => {
+        return NewContent(div, 'text', function () {
             div.innerHTML = text;
         });
     };
@@ -207,11 +208,12 @@ const Diaps = function (selector, onStart) {
     };
 
     const Sound = {};
+    Sound.current = false;
     Sound.add = function add (src) {
-        return function () {
+        return function addSound () {
             if (!_isQuiet) {
-                const audio = new Audio(src);
-                audio.play();
+                Sound.current = new Audio(src);
+                Sound.current.play();
             }
         };
     };
@@ -243,14 +245,16 @@ const Diaps = function (selector, onStart) {
         });
         chain.onStart(function () {
             timer.start();
+            Sound.current && Sound.current.play();
             startButton.classList.remove('zoomIn');
             startButton.classList.add('animated', 'zoomOut');
         });
 
         chain.onPause(function () {
             timer.stop();
+            Sound.current && Sound.current.pause();
             startButton.style.display = 'block';
-            window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(function () {
                 startButton.classList.remove('zoomOut');
                 startButton.classList.add('animated', 'zoomIn');
             })
