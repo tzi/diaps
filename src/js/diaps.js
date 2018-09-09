@@ -27,26 +27,27 @@ const Diaps = function (selector, onStart) {
                     return true;
                 }
                 content.classList.add('animated', animation);
-                console.log('start add');
-                window.requestAnimationFrame(function () {
-                    content.addEventListener('animationend', function() {
-                        content.classList.remove('animated', animation);
-                        console.log('stop add');
-                    });
+                content.addEventListener('animationend', () => {
+                    content.classList.remove(animation);
                 });
             }
         };
+		
+		const querying = function(query) {
+			if (query && query.tagName) {
+				return query;
+			}
+			if (query === 'first') {
+			  return contentList[0];
+			}
+			 
+			return contentList[contentList.length - 1];
+		}
 
         const animate = function (query, animation = false, onEnd = false) {
-            let content;
+            const content = querying(query);
 
             return function animateContent() {
-                if (query === 'first') {
-                  content = contentList[0];
-                } else {
-                  content = contentList[contentList.length - 1];
-                }
-
                 if (!content) {
                     return true;
                 }
@@ -59,13 +60,10 @@ const Diaps = function (selector, onStart) {
                 }
 
                 content.classList.add('animated', animation);
-                console.log('start remove');
                 if (onEnd) {
-                    console.log('here', content);
-                    window.requestAnimationFrame(function() {
-                        content.addEventListener('animationend', function() {
+                    window.requestAnimationFrame(() => {
+                        content.addEventListener('animationend', () => {
                             onEnd(content);
-                            console.log('stop remove');
                         });
                     });
                 }
@@ -73,11 +71,15 @@ const Diaps = function (selector, onStart) {
         };
 
         const remove = function (query, animation = false) {
-            return animate(query, animation, function(content) {
-                console.log(content);
-                content.parentNode.removeChild(content);
-                contentList.splice(contentList.indexOf(content), 1);
-            });
+			
+            return function() {
+				const content = querying(query);
+				contentList.splice(contentList.indexOf(content), 1);
+				console.log(content);
+				animate(content, animation, () => {
+					content.parentNode.removeChild(content);
+				})();
+			}
         };
 
         return {add, animate, remove};
@@ -254,6 +256,7 @@ const Diaps = function (selector, onStart) {
         startButton.addEventListener('click', chain.start);
 
         document.addEventListener('keypress', function (event) {
+            console.log(event.which);
             if (event.which === 32) {
                 if (!chain.toggle()) {
                     window.location.hash = `#${timer.getTime()}`;
