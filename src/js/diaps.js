@@ -5,13 +5,13 @@ const Diaps = function (selector, onStart) {
         node.appendChild(layerElement);
 
         const container = {};
-        container.media = Container(layerElement);
-        container.text = Container(layerElement);
+        container.media = Container(layerElement, 'media');
+        container.text = Container(layerElement, 'text');
 
         return {container};
     };
 
-    const Container = function (layerNode) {
+    const Container = function (layerNode, containerName) {
         const contentList = [];
 
         const add = function (node, animation, onStart) {
@@ -27,26 +27,27 @@ const Diaps = function (selector, onStart) {
                     return true;
                 }
                 content.classList.add('animated', animation);
-                console.log('start add');
-                window.requestAnimationFrame(function () {
-                    content.addEventListener('animationend', function() {
-                        content.classList.remove('animated', animation);
-                        console.log('stop add');
-                    });
+                content.addEventListener('animationend', () => {
+                    content.classList.remove(animation);
                 });
             }
         };
+		
+		const querying = function(query) {
+			if (query && query.tagName) {
+				return query;
+			}
+			if (query === 'first') {
+			  return contentList[0];
+			}
+			 
+			return contentList[contentList.length - 1];
+		}
 
         const animate = function (query, animation = false, onEnd = false) {
-            let content;
+            const content = querying(query);
 
             return function animateContent() {
-                if (query === 'first') {
-                  content = contentList[0];
-                } else {
-                  content = contentList[contentList.length - 1];
-                }
-
                 if (!content) {
                     return true;
                 }
@@ -59,13 +60,10 @@ const Diaps = function (selector, onStart) {
                 }
 
                 content.classList.add('animated', animation);
-                console.log('start remove');
                 if (onEnd) {
-                    console.log('here', content);
-                    window.requestAnimationFrame(function() {
-                        content.addEventListener('animationend', function() {
+                    window.requestAnimationFrame(() => {
+                        content.addEventListener('animationend', () => {
                             onEnd(content);
-                            console.log('stop remove');
                         });
                     });
                 }
@@ -73,11 +71,19 @@ const Diaps = function (selector, onStart) {
         };
 
         const remove = function (query, animation = false) {
-            return animate(query, animation, function(content) {
-                console.log(content);
-                content.parentNode.removeChild(content);
-                contentList.splice(contentList.indexOf(content), 1);
-            });
+			
+            return function removeContent() {
+				const content = querying(query);
+                if (!content) {
+					console.error('Impossible to remove "' + query + '" ' + containerName + ' with "' + animation + '" animation');
+                    return true;
+                }
+				
+				contentList.splice(contentList.indexOf(content), 1);
+				animate(content, animation, () => {
+					content.parentNode.removeChild(content);
+				})();
+			}
         };
 
         return {add, animate, remove};
@@ -144,7 +150,6 @@ const Diaps = function (selector, onStart) {
             return remove('fadeOut');
         };
 
-
         return {remove, slideOutUp, slideOutLeft, slideOutRight, slideOutDown, bounce, bounceOut, fadeOut};
     };
 
@@ -202,11 +207,12 @@ const Diaps = function (selector, onStart) {
     };
 
     const Sound = {};
+	Sound.current;
     Sound.add = function add(src) {
-        return function () {
+        return function addSound() {
             if (!_isQuiet) {
-                const audio = new Audio(src);
-                audio.play();
+                Sound.current = new Audio(src);
+                Sound.current.play();
             }
         }
     };
@@ -238,12 +244,14 @@ const Diaps = function (selector, onStart) {
         });
         chain.onStart(function () {
             timer.start();
+			Sound.current && Sound.current.play();
             startButton.classList.remove('zoomIn');
             startButton.classList.add('animated', 'zoomOut');
         });
 
         chain.onPause(function () {
             timer.stop();
+			Sound.current && Sound.current.pause();
             startButton.style.display = 'block';
             window.requestAnimationFrame(() => {
                 startButton.classList.remove('zoomOut');
