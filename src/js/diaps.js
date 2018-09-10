@@ -20,34 +20,37 @@ const Diaps = function (selector, onStart) {
             content.classList.add('diaps__content');
             layerNode.appendChild(content);
 
-            return function addContent() {
+            return function addContent () {
                 onStart(node);
                 contentList.push(content);
                 if (!animation || _isQuiet) {
                     return true;
                 }
                 content.classList.add('animated', animation);
-                content.addEventListener('animationend', () => {
-                    content.classList.remove(animation);
+                window.requestAnimationFrame(function () {
+                    content.addEventListener('animationend', () => {
+                        content.classList.remove(animation);
+                    })
+                    ;
                 });
-            }
+            };
         };
-		
-		const querying = function(query) {
-			if (query && query.tagName) {
-				return query;
-			}
-			if (query === 'first') {
-			  return contentList[0];
-			}
-			 
-			return contentList[contentList.length - 1];
-		}
+
+        const querying = function (query) {
+            if (query && query.tagName) {
+                return query;
+            }
+            if (query === 'first') {
+                return contentList[0];
+            }
+
+            return contentList[contentList.length - 1];
+        };
 
         const animate = function (query, animation = false, onEnd = false) {
             const content = querying(query);
 
-            return function animateContent() {
+            return function animateContent () {
                 if (!content) {
                     return true;
                 }
@@ -64,22 +67,23 @@ const Diaps = function (selector, onStart) {
                     window.requestAnimationFrame(() => {
                         content.addEventListener('animationend', () => {
                             onEnd(content);
-                        });
-                    });
+                        })
+                        ;
+                    })
+                    ;
                 }
             };
         };
 
         const remove = function (query, animation = false) {
-			
-            return function() {
-				const content = querying(query);
-				contentList.splice(contentList.indexOf(content), 1);
-				console.log(content);
-				animate(content, animation, () => {
-					content.parentNode.removeChild(content);
-				})();
-			}
+            return function () {
+                const content = querying(query);
+                contentList.splice(contentList.indexOf(content), 1);
+                console.log(content);
+                animate(content, animation, function () {
+                    content.parentNode.removeChild(content);
+                })();
+            };
         };
 
         return {add, animate, remove};
@@ -137,7 +141,7 @@ const Diaps = function (selector, onStart) {
             return remove('slideOutDown');
         };
         const bounce = function () {
-            return animate('bounce')
+            return animate('bounce');
         };
         const bounceOut = function () {
             return remove('bounceOut');
@@ -145,7 +149,6 @@ const Diaps = function (selector, onStart) {
         const fadeOut = function () {
             return remove('fadeOut');
         };
-
 
         return {remove, slideOutUp, slideOutLeft, slideOutRight, slideOutDown, bounce, bounceOut, fadeOut};
     };
@@ -188,7 +191,7 @@ const Diaps = function (selector, onStart) {
     };
 
     const Text = {};
-    Text.add = function add(text, ...extraClasses) {
+    Text.add = function add (text, ...extraClasses) {
         const div = document.createElement('div');
         div.classList.add('diaps__text', ...extraClasses);
 
@@ -196,7 +199,7 @@ const Diaps = function (selector, onStart) {
             div.innerHTML = text;
         });
     };
-    Text.from = function from(layer) {
+    Text.from = function from (layer) {
         return ExistingContent(layer.container.text);
     };
     Text.first = function (layer) {
@@ -204,13 +207,13 @@ const Diaps = function (selector, onStart) {
     };
 
     const Sound = {};
-    Sound.add = function add(src) {
+    Sound.add = function add (src) {
         return function () {
             if (!_isQuiet) {
                 const audio = new Audio(src);
                 audio.play();
             }
-        }
+        };
     };
 
     const initialize = function () {
@@ -233,7 +236,7 @@ const Diaps = function (selector, onStart) {
             }
         }
 
-        startButton.addEventListener('animationend', () => {
+        startButton.addEventListener('animationend', function () {
             if (chain.isActive()) {
                 startButton.style.display = 'none';
             }
@@ -250,19 +253,19 @@ const Diaps = function (selector, onStart) {
             window.requestAnimationFrame(() => {
                 startButton.classList.remove('zoomOut');
                 startButton.classList.add('animated', 'zoomIn');
-            });
+            })
+            ;
         });
 
         startButton.addEventListener('click', chain.start);
 
         document.addEventListener('keypress', function (event) {
-            console.log(event.which);
             if (event.which === 32) {
                 if (!chain.toggle()) {
                     window.location.hash = `#${timer.getTime()}`;
                 }
             }
-        })
+        });
     };
 
     const setIsQuiet = function (isQuiet) {
