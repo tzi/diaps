@@ -1,14 +1,15 @@
 const Diaps = function (selector, onStart) {
+    let zIndex = 1;
+
     const Layer = function (node, layerClass) {
         const layerElement = document.createElement('div');
         layerElement.classList.add('diaps__layer', `diaps__layer--${layerClass}`);
         node.appendChild(layerElement);
 
-        const container = {};
-        container.media = Container(layerElement, 'media');
-        container.text = Container(layerElement, 'text');
+        const media = Container(layerElement, 'media');
+        const text = Container(layerElement, 'text');
 
-        return {container};
+        return { media, text, element: layerElement };
     };
 
     const Container = function (layerNode, containerName) {
@@ -18,6 +19,7 @@ const Diaps = function (selector, onStart) {
             const content = document.createElement('div');
             content.appendChild(node);
             content.classList.add('diaps__content');
+            content.style.zIndex = zIndex++;
             layerNode.appendChild(content);
 
             return function addContent () {
@@ -92,7 +94,7 @@ const Diaps = function (selector, onStart) {
 
     const NewContent = function (node, type = false, onStart = false) {
         const add = function (layer, animation = false) {
-            const container = layer.container[type];
+            const container = layer[type];
             return container.add(node, animation, onStart);
         };
 
@@ -166,10 +168,10 @@ const Diaps = function (selector, onStart) {
         });
     };
     Image.from = function (layer) {
-        return ExistingContent(layer.container.media);
+        return ExistingContent(layer.media);
     };
     Image.first = function (layer) {
-        return ExistingContent(layer.container.media, query = 'first');
+        return ExistingContent(layer.media, query = 'first');
     };
 
     const Video = {};
@@ -185,10 +187,10 @@ const Diaps = function (selector, onStart) {
         });
     };
     Video.from = function (layer) {
-        return ExistingContent(layer.container.media);
+        return ExistingContent(layer.media);
     };
     Video.first = function (layer) {
-        return ExistingContent(layer.container.media, query = 'first');
+        return ExistingContent(layer.media, query = 'first');
     };
 
     const Text = {};
@@ -201,10 +203,10 @@ const Diaps = function (selector, onStart) {
         });
     };
     Text.from = function from (layer) {
-        return ExistingContent(layer.container.text);
+        return ExistingContent(layer.text);
     };
     Text.first = function (layer) {
-        return ExistingContent(layer.container.media, query = 'first');
+        return ExistingContent(layer.media, query = 'first');
     };
 
     const Sound = {};
@@ -292,15 +294,17 @@ c6.911,0,12.514,5.607,12.514,12.518C27.541,21.941,21.937,27.542,15.026,27.542z">
 <div class="diaps__timer"></div>`;
     const layers = {};
     layers.background = Layer(node, 'background');
-    layers.center = Layer(node, 'center');
-    layers.top = Layer(node, 'top');
-    layers.left = Layer(node, 'left');
-    layers.right = Layer(node, 'right');
-    layers.bottom = Layer(node, 'bottom');
-    layers.nw = Layer(node, 'nw');
-    layers.ne = Layer(node, 'ne');
-    layers.se = Layer(node, 'se');
-    layers.sw = Layer(node, 'sw');
+    const half = Layer(node, 'half');
+    layers.center = Layer(half.element, 'center');
+    layers.top = Layer(half.element, 'top');
+    layers.left = Layer(half.element, 'left');
+    layers.right = Layer(half.element, 'right');
+    layers.bottom = Layer(half.element, 'bottom');
+    const quarter = Layer(node, 'half');
+    layers.nw = Layer(quarter.element, 'nw');
+    layers.ne = Layer(quarter.element, 'ne');
+    layers.se = Layer(quarter.element, 'se');
+    layers.sw = Layer(quarter.element, 'sw');
     let _isQuiet = false;
     const controls = {Image, Video, Text, Sound, layers, setIsQuiet};
 

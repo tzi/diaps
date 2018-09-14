@@ -32,52 +32,48 @@ body {
     max-height: 90%;
 }
 
-.diaps__layer--center {
-    z-index: 2;
+.diaps__layer--half {
+    z-index: 3;
 }
 
 .diaps__layer--left {
     right: 50%;
-    z-index: 3;
 }
 
 .diaps__layer--right {
     left: 50%;
-    z-index: 3;
 }
 
 .diaps__layer--top {
     bottom: 50%;
-    z-index: 4;
 }
 
 .diaps__layer--bottom {
     top: 50%;
-    z-index: 4;
+}
+
+.diaps__layer--quarter {
+    z-index: 5;
 }
 
 .diaps__layer--nw {
     right: 45%;
     bottom: 45%;
-    z-index: 5;
 }
 
 .diaps__layer--ne {
     left: 45%;
-    bottom: 40%;
-    z-index: 5;
+    bottom: 45%;
 }
 
 .diaps__layer--se {
     left: 45%;
     top: 45%;
-    z-index: 5;
 }
 
 .diaps__layer--sw {
     right: 45%;
     top: 45%;
-    z-index: 5;
 }
 
 .diaps__media {
